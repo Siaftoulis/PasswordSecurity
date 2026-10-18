@@ -3,23 +3,22 @@ import java.io.FileReader;
 import java.io.File;
 import java.io.IOException;
 
-import javax.print.DocFlavor.STRING;
-
 /** 
-*  
-Author:        Γράψτε εδώ το όνομα σας 
-*  Written:       ../../2026 
-*  Last updated:  ../../2026 
-* 
-*  
-*  
-*   
-Compilation command:    
-Execution command:      
-*  Γράψτε εδώ πληροφορίες σχετικά με το τι κάνει  
-*  το πρόγραμμα 
-* 
-*/
+ * Author:        Giannis Papavlas
+ * Written:       05/10/2026 
+ * Last updated:  18/10/2026 
+ * 
+ * Compilation command: javac -encoding UTF-8 PasswordSecurity.java
+ * Execution command:   java -Dfile.encoding=UTF-8 PasswordSecurity
+ * 
+ * PasswordSecurity - Cybersecurity utilities for password analysis and generation:
+ * 1. generatePassword: Creates random, strong passwords with Fisher-Yates shuffle
+ * 2. enforceStrongPasswordRequirements: Evaluates password strength policy
+ * 3. calculatePossibilities: Calculates total combinatorial possibilities
+ * 4. estimatePasswordCrackingTime: Calculates brute-force time in seconds & years
+ * 5. dictionaryAttack: Simulates dictionary attack using wordlist
+ * 6. generatePassphrase: Creates memorable passphrases with customizable options
+ */
 public class PasswordSecurity {
     // Built-in word list of common, easy-to-remember words
     private static final String[] WORD_LIST = {
@@ -62,12 +61,12 @@ public class PasswordSecurity {
     public static String generatePassword (int length, boolean useLowercase, boolean useUppercase, boolean useDigits, boolean useSpecialChars) {
 
 
-        // 1.Validation
+        // 1. Validation
         if (!useLowercase && !useUppercase && !useDigits && !useSpecialChars) {
-            return "Error: At least one of each characher type is needed!";
+            return "Error: At least one character type must be selected!";
         }
 
-        // 2.Count the nunbers of selected characters groups
+        // 2. Count the number of selected character groups
         int groups = 0;
         if (useUppercase) groups++;
         if (useLowercase) groups++;
@@ -75,7 +74,7 @@ public class PasswordSecurity {
         if (useSpecialChars) groups++;
         
         if (length < groups) {
-            return "Error: Length of password is too short to include all selected character types!";
+            return "Error: Length is too short to include all selected character types!";
         }
         // 3.Chararacter pools
         String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -121,15 +120,18 @@ public class PasswordSecurity {
     
     
 
-    //Default overload with all characters types enabled
-    public String generatePassword(int length) {
-
+    // Default overload with all characters types enabled
+    public static String generatePassword(int length) {
         return generatePassword(length, true, true, true, true);
     }
 
-    //Shake_case allias for compatability
-    public static String genete_password(int length , boolean useLowercase , boolean useUppercase , boolean useDigits , boolean useSpecialChars){
+    // Snake_case alias for compatibility
+    public static String generate_password(int length, boolean useLowercase, boolean useUppercase, boolean useDigits, boolean useSpecialChars) {
         return generatePassword(length, useLowercase, useUppercase, useDigits, useSpecialChars);
+    }
+
+    public static String generate_password(int length) {
+        return generatePassword(length);
     }
 
     /*---------------------------------------------------------
@@ -172,27 +174,27 @@ public class PasswordSecurity {
                 }
             }
         }
-        // Checks all the criteria if are satifiead
+        // Checks all the criteria
         if (hasDigit && hasLower && hasMinLenght && hasSpecial && hasUpper) {
-            return "Ο κωδικός πρόσβασής σας είναι ισχυρός και πληροί όλες τις απαιτήσεις!";
+            return "Your password is strong and meets all requirements!";
         }
 
-        //build feeback string listing all missing requirement
-        String message = "Ο κωδικός πρόσβασής σας λείπει:";
-        if(!hasMinLenght) {
-            message += "\n - Τουλάχιστον 8 χαρακτήρες";
-        }
-        if (!hasDigit) {
-            message +="\n - Τουλάχιστον ένα ψηφίο";
-        }
-        if (!hasLower) {
-            message += "\n - Τουλάχιστον ένα μικρό γράμμα";
+        // Build feedback string listing all missing requirements (matching sample output order)
+        String message = "Your password is missing:";
+        if (!hasMinLenght) {
+            message += "\n - At least 8 characters";
         }
         if (!hasUpper) {
-            message +="\n - Τουλάχιστον ένα κεφαλαίο γράμμα";
+            message += "\n - At least one uppercase letter";
+        }
+        if (!hasDigit) {
+            message += "\n - At least one digit";
         }
         if (!hasSpecial) {
-            message +="\n - Τουλάχιστον ένας ειδικός χαρακτήρας";
+            message += "\n - At least one special character";
+        }
+        if (!hasLower) {
+            message += "\n - At least one lowercase letter";
         }
         return message;
     }
@@ -209,7 +211,6 @@ public class PasswordSecurity {
     /*---------------------------------------------------------
     * Part 3
     *---------------------------------------------------------*/
-    //blablabla yap
     //This is the calc method =+=
     public static Long calculate_possibilities(String password){
         if(password== null || password.length() == 0){
