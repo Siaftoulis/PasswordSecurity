@@ -253,6 +253,181 @@ public class PasswordSecurity {
         return calculate_possibilities(password);
     }
 
+    /*---------------------------------------------------------
+    * Part 4 : Estimate Time to Crack
+    *---------------------------------------------------------*/
+    // Calculates how long it takes to brute-force crack the password
+    // assuming a speed of 1,000,000 attempts per second
+    // Returns array: [timeInSeconds, timeInYears]
+    public static double[] estimatePasswordCrackingTime(String password) {
+        long totalPossibilities = calculatePossibilities(password);
+        double guessesPerSecond = 1000000.0; // 1 million attempts per second
+
+        // 1. Calculate time in seconds
+        double timeInSeconds = (double) totalPossibilities / guessesPerSecond;
+
+        // 2. Convert seconds to years (365.25 days to count leap years)
+        double timeInYears = timeInSeconds / (60.0 * 60.0 * 24.0 * 365.25);
+
+        return new double[] { timeInSeconds, timeInYears };
+    }
+
+    //Shake_case alias for compatibility
+    public static double[] estimate_password_cracking_time(String password) {
+        return estimatePasswordCrackingTime(password);
+    }
+
+    /*---------------------------------------------------------
+    * Part 5 : Dictionary Attack Simulation
+    *---------------------------------------------------------*/
+    // Default overload using "Rockyou.txt" dictionary file
+    public static Object[] dictionaryAttack(String targetPassword) {
+        return dictionaryAttack(targetPassword, "Rockyou.txt");
+    }
+
+    // Simulates a dictionary attack by checking target against words in a file
+    // Returns array: [elapsedTimeInSeconds (or null if not found), total attempts]
+    public static Object[] dictionaryAttack(String targetPassword, String dictionaryFile) {
+        long startTime = System.nanoTime();
+        int attempts = 0;
+
+        File file = new File(dictionaryFile);
+        // Check if the wordlist file exists before trying to read
+        if (!file.exists()) {
+            return new Object[] { null, 0 };
+        }
+
+        // Read through dictionary file line by line
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                attempts++;
+                // Trim whitespace and check for a match
+                if (line.trim().equals(targetPassword)) {
+                    long endTime = System.nanoTime();
+                    double elapsedSeconds = (endTime - startTime) / 1_000_000_000.0;
+                    return new Object[] { elapsedSeconds, attempts };
+                }
+            }
+            // Scanned entire wordlist without finding a match
+            return new Object[] { null, attempts };
+        } catch (IOException e) {
+            // Handle file reading error
+            return new Object[] { null, attempts };
+        }
+    }
+
+    //Shake_case alias for compatibility
+    public static Object[] dictionary_attack(String targetPassword) {
+        return dictionaryAttack(targetPassword);
+    }
+
+    public static Object[] dictionary_attack(String targetPassword, String dictionaryFile) {
+        return dictionaryAttack(targetPassword, dictionaryFile);
+    }
+
+    /*---------------------------------------------------------
+    * Part 6 : Generate Memorable Passphrase
+    *---------------------------------------------------------*/
+    // Default overload: 4 words, hyphen-separated, capitalized, with trailing number
+    public static String generatePassphrase(int wordCount) {
+        return generatePassphrase(wordCount, "-", true, true);
+    }
+
+    // Generates a memorable passphrase picking random words from WORD_LIST
+    public static String generatePassphrase(int wordCount, String separator,
+                                            boolean capitalizeEach, boolean appendNumber) {
+        // 1. Validation - check that wordCount is at least 3 words
+        if (wordCount < 3) {
+            return "Error: Passphrase must contain at least 3 words.";
+        }
+
+        String result = "";
+        // 2. Pick random words from WORD_LIST and join them together
+        for (int i = 0; i < wordCount; i++) {
+            // Select random word from the list
+            int randomIndex = (int) (Math.random() * WORD_LIST.length);
+            String word = WORD_LIST[randomIndex];
+
+            // Capitalize first letter if requested, else make it all lowercase
+            if (capitalizeEach && word.length() > 0) {
+                word = Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+            } else {
+                word = word.toLowerCase();
+            }
+
+            // Append separator before word (skip for the very first word)
+            if (i > 0) {
+                result += separator;
+            }
+            result += word;
+        }
+
+        // 3. Append a random 2-digit number (10 to 99) at the end if requested
+        if (appendNumber) {
+            int randomTwoDigit = 10 + (int) (Math.random() * 90);
+            result += separator + randomTwoDigit;
+        }
+
+        return result;
+    }
+
+    //Shake_case alias for compatibility
+    public static String generate_passphrase(int wordCount) {
+        return generatePassphrase(wordCount);
+    }
+
+    public static String generate_passphrase(int wordCount, String separator, boolean capitalizeEach, boolean appendNumber) {
+        return generatePassphrase(wordCount, separator, capitalizeEach, appendNumber);
+    }
+
+    /*---------------------------------------------------------
+    * Part 7 : Main Test Method
+    *---------------------------------------------------------*/
+    public static void main(String[] args) {
+        // Testing Part 1: password generation
+        System.out.println("=== Part 1: Generate Password ===");
+        String pwd = generatePassword(12, true, true, true, true);
+        System.out.println("Generated (12 chars, all types): " + pwd);
+        System.out.println(generatePassword(3, true, true, true, true));
+        System.out.println(generatePassword(8, false, false, false, false));
+
+        // Testing Part 2: enforce strong password requirements
+        System.out.println("\n=== Part 2: Enforce Strong Password Requirements ===");
+        System.out.println(enforceStrongPasswordRequirements("P@ssw0rd"));
+        System.out.println(enforceStrongPasswordRequirements("password"));
+
+        // Testing Part 3: calculate password possibilities
+        System.out.println("\n=== Part 3: Calculate Password Possibilities ===");
+        long possibilities = calculatePossibilities("P@ssw0rd");
+        System.out.println("Total possible combinations: " + possibilities);
+
+        // Testing Part 4: brute-force crack time estimation
+        System.out.println("\n=== Part 4: Estimate Time to Crack ===");
+        double[] times = estimatePasswordCrackingTime("P@ssw0rd");
+        System.out.printf("Estimated time to crack: %.6f seconds (~%.8f years)%n", times[0], times[1]);
+
+        // Testing Part 5: dictionary attack simulation
+        System.out.println("\n=== Part 5: Dictionary Attack ===");
+        Object[] result = dictionaryAttack("password123");
+        if (result[0] != null) {
+            System.out.printf("Password found in %.2f seconds after %d attempts.%n", result[0], result[1]);
+        } else {
+            System.out.printf("Password not found after %d attempts.%n", result[1]);
+        }
+
+        // Testing Part 6: memorable passphrase generation
+        System.out.println("\n=== Part 6: Generate Memorable Passphrase ===");
+        // 4 words, hyphen-separated, capitalized, with number (default style)
+        System.out.println(generatePassphrase(4));
+        // 3 words, space-separated, lowercase, no number
+        System.out.println(generatePassphrase(3, " ", false, false));
+        // 5 words, underscore-separated, capitalized, with number
+        System.out.println(generatePassphrase(5, "_", true, true));
+        // Error case: too few words
+        System.out.println(generatePassphrase(2));
+    }
+
 
     
 }
