@@ -69,9 +69,9 @@ public class PasswordSecurity {
 
         // 2.Count the nunbers of selected characters groups
         int groups = 0;
+        if (useUppercase) groups++;
         if (useLowercase) groups++;
         if (useDigits) groups++;
-        if (useLowercase) groups++;
         if (useSpecialChars) groups++;
         
         if (length < groups) {
@@ -165,7 +165,7 @@ public class PasswordSecurity {
                     hasLower =true;
                 } else if (ch >= 'A' && ch <= 'Z') {
                     hasUpper = true;
-                } else if (ch >= 0 && ch <= 9) {
+                } else if (ch >= '0' && ch <= '9') {
                     hasDigit = true;
                 } else if (special.indexOf(ch) >= 0) {
                     hasSpecial = true;
@@ -180,7 +180,7 @@ public class PasswordSecurity {
         //build feeback string listing all missing requirement
         String message = "Ο κωδικός πρόσβασής σας λείπει:";
         if(!hasMinLenght) {
-            message += "\n - Τουλάχιστον ένα κεφαλαίο γράμμα";
+            message += "\n - Τουλάχιστον 8 χαρακτήρες";
         }
         if (!hasDigit) {
             message +="\n - Τουλάχιστον ένα ψηφίο";
